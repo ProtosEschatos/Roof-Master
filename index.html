@@ -112,6 +112,50 @@
                     </div>
                 </div>
 
+                <div class="panel space-y-4">
+                    <h2 class="text-lg font-bold text-white border-b border-slate-700 pb-2">💰 Cijene Materijala</h2>
+                    <p class="text-xs text-slate-500">Unesite cijene za automatski troškovnik</p>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="label">Drvo — cijena (€/m³)</label>
+                            <input type="number" id="cDrvo" class="input-field" value="0" min="0" step="10" oninput="izracunaj()">
+                        </div>
+                        <div>
+                            <label class="label">Pokrov — cijena (€/m²)</label>
+                            <input type="number" id="cPokrov" class="input-field" value="0" min="0" step="1" oninput="izracunaj()">
+                        </div>
+                        <div>
+                            <label class="label">Folija — cijena (€/m²)</label>
+                            <input type="number" id="cFolija" class="input-field" value="0" min="0" step="0.5" oninput="izracunaj()">
+                        </div>
+                        <div>
+                            <label class="label">Rad (€/dan/radnik)</label>
+                            <input type="number" id="cRad" class="input-field" value="0" min="0" step="10" oninput="izracunaj()">
+                        </div>
+                        <div>
+                            <label class="label">Skela / Dizalica (€)</label>
+                            <input type="number" id="cSkela" class="input-field" value="0" min="0" step="50" oninput="izracunaj()">
+                        </div>
+                        <div>
+                            <label class="label">Ostalo / Paušal (€)</label>
+                            <input type="number" id="cOstalo" class="input-field" value="0" min="0" step="50" oninput="izracunaj()">
+                        </div>
+                    </div>
+
+                    <div id="troskovi-panel" class="hidden bg-slate-950 rounded-lg p-3 border border-slate-700 space-y-1 text-sm">
+                        <div class="flex justify-between text-slate-400"><span>Drvena građa:</span><strong id="t-drvo" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>Pokrov:</span><strong id="t-pokrov" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>Folija:</span><strong id="t-folija" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>Radna snaga:</span><strong id="t-rad" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>Skela/Dizalica:</span><strong id="t-skela" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>Ostalo:</span><strong id="t-ostalo" class="text-white">0 €</strong></div>
+                        <div class="border-t border-slate-600 pt-2 mt-2 flex justify-between"><span class="font-bold text-white">UKUPNO:</span><strong id="t-ukupno" class="text-yellow-400 text-base">0 €</strong></div>
+                        <div class="flex justify-between text-slate-500 text-xs"><span>PDV (25%):</span><span id="t-pdv">0 €</span></div>
+                        <div class="flex justify-between text-xs"><span class="text-slate-400">UKUPNO s PDV-om:</span><strong id="t-ukupno-pdv" class="text-green-400">0 €</strong></div>
+                    </div>
+                </div>
+
                 <div class="panel bg-slate-800 border-blue-900">
                     <h2 class="text-lg font-bold text-blue-400 mb-4">Brzi Rezultati</h2>
                     <ul class="text-sm space-y-2 text-slate-300">
@@ -336,6 +380,43 @@
                 m2Folije: (povrsinaKrova * 1.15).toFixed(2),
                 datumPocetkaStr, brojRadnika, ukupnoDana
             };
+
+            // --- TROŠKOVNIK ---
+            const cDrvo   = parseFloat(document.getElementById('cDrvo').value)   || 0;
+            const cPokrov = parseFloat(document.getElementById('cPokrov').value) || 0;
+            const cFolija = parseFloat(document.getElementById('cFolija').value) || 0;
+            const cRad    = parseFloat(document.getElementById('cRad').value)    || 0;
+            const cSkela  = parseFloat(document.getElementById('cSkela').value)  || 0;
+            const cOstalo = parseFloat(document.getElementById('cOstalo').value) || 0;
+
+            const tDrvo   = ukupnoDrvoM3 * cDrvo;
+            const tPokrov = povrsinaKrova * cPokrov;
+            const tFolija = parseFloat(trenutniProracun.m2Folije) * cFolija;
+            const tRad    = ukupnoDana * brojRadnika * cRad;
+            const tSkela  = cSkela;
+            const tOstalo = cOstalo;
+            const tUkupno = tDrvo + tPokrov + tFolija + tRad + tSkela + tOstalo;
+            const tPdv    = tUkupno * 0.25;
+            const tSPdv   = tUkupno + tPdv;
+
+            const fmt = v => v > 0 ? v.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €' : '0 €';
+
+            if (tUkupno > 0) {
+                document.getElementById('troskovi-panel').classList.remove('hidden');
+                document.getElementById('t-drvo').innerText   = fmt(tDrvo);
+                document.getElementById('t-pokrov').innerText = fmt(tPokrov);
+                document.getElementById('t-folija').innerText = fmt(tFolija);
+                document.getElementById('t-rad').innerText    = fmt(tRad);
+                document.getElementById('t-skela').innerText  = fmt(tSkela);
+                document.getElementById('t-ostalo').innerText = fmt(tOstalo);
+                document.getElementById('t-ukupno').innerText = fmt(tUkupno);
+                document.getElementById('t-pdv').innerText    = fmt(tPdv);
+                document.getElementById('t-ukupno-pdv').innerText = fmt(tSPdv);
+            } else {
+                document.getElementById('troskovi-panel').classList.add('hidden');
+            }
+
+            trenutniProracun.troskovi = { tDrvo, tPokrov, tFolija, tRad, tSkela, tOstalo, tUkupno, tPdv, tSPdv };
 
             fazeRadova = izracunajDatumeFaza(datumPocetkaStr, [
                 { id: "F1", naziv: "1. Priprema, skele i doprema", trajanje: d1_priprema, boja: "bg-amber-600" },
@@ -764,6 +845,30 @@
                 doc.text(`${f.startStr} – ${f.endStr}  (${f.trajanje} dana)`, 130, y);
                 y += 6;
             });
+
+            // Troškovnik (ako postoji)
+            const tr = p.troskovi;
+            if (tr && tr.tUkupno > 0) {
+                if (y > 220) { doc.addPage(); y = 20; }
+                y += 4;
+                naslov("5. TROŠKOVNIK");
+                const fmt2 = v => v.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+                if (tr.tDrvo   > 0) redak("Drvena građa:", fmt2(tr.tDrvo));
+                if (tr.tPokrov > 0) redak("Pokrov:", fmt2(tr.tPokrov));
+                if (tr.tFolija > 0) redak("Folija:", fmt2(tr.tFolija));
+                if (tr.tRad    > 0) redak("Radna snaga:", fmt2(tr.tRad));
+                if (tr.tSkela  > 0) redak("Skela / Dizalica:", fmt2(tr.tSkela));
+                if (tr.tOstalo > 0) redak("Ostalo / Paušal:", fmt2(tr.tOstalo));
+                y += 2;
+                doc.setDrawColor(37, 99, 235); doc.setLineWidth(0.4); doc.line(18, y, 192, y); y += 5;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(20, 20, 20);
+                doc.text("UKUPNO (bez PDV-a):", 18, y);
+                doc.setTextColor(220, 150, 20); doc.text(fmt2(tr.tUkupno), 150, y); y += 7;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(100, 100, 100);
+                doc.text(`PDV 25%:`, 18, y); doc.text(fmt2(tr.tPdv), 150, y); y += 6;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(20, 140, 60);
+                doc.text("UKUPNO S PDV-om:", 18, y); doc.text(fmt2(tr.tSPdv), 150, y);
+            }
 
             doc.save(`Kroviste_Proracun_${new Date().toISOString().split('T')[0]}.pdf`);
             prikaziObavijest("PDF preuzet!");
