@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="hr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-TREME MASTER v50.1 AI ULTIMATE + Terminski Plan</title>
+    <meta name="description" content="AI Ultimate - Proračun i Terminsko Planiranje Krovišta, Statička Analiza i Vizualizacija">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js za 3D prikaz -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- jsPDF za PDF generiranje -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .panel { background-color: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; padding: 1.5rem; }
+        .input-field { background-color: #0f172a; border: 1px solid #475569; color: #f8fafc; padding: 0.5rem; border-radius: 0.25rem; width: 100%; outline: none; transition: border-color 0.2s; }
+        .input-field:focus { border-color: #3b82f6; }
+        .label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; margin-bottom: 0.25rem; display: block; }
+        .btn { padding: 0.5rem 1rem; border-radius: 0.25rem; font-weight: bold; cursor: pointer; transition: opacity 0.2s; width: 100%; text-align: center; display: inline-block; }
+        .btn:hover { opacity: 0.9; }
+        .btn-blue { background-color: #2563eb; color: white; }
+        .btn-yellow { background-color: #eab308; color: #0f172a; }
+        .btn-green { background-color: #16a34a; color: white; }
+        .btn-slate { background-color: #475569; color: white; }
+        #canvas-container { width: 100%; height: 350px; background-color: #020617; border-radius: 0.5rem; overflow: hidden; border: 1px solid #334155; position: relative; }
+        #toast { position: fixed; bottom: 20px; right: 20px; background-color: #10b981; color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 50; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        .loader { border: 2px solid rgba(0,0,0,0.1); border-top: 2px solid currentColor; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .gantt-scroll::-webkit-scrollbar { height: 6px; }
+        .gantt-scroll::-webkit-scrollbar-track { background: #0f172a; }
+        .gantt-scroll::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-700 pb-4 mb-6">
+            <div>
+                <h1 class="text-3xl font-black tracking-tight text-white">🚀 X-TREME <span class="text-yellow-500">MASTER v50.1</span></h1>
+                <p class="text-slate-400 text-sm mt-1">AI Ultimate - Proračun i Terminsko Planiranje Krovišta</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center space-x-3 bg-slate-800 p-2 rounded-lg border border-slate-700">
+                <div id="api-status-dot" class="w-3 h-3 rounded-full bg-red-500 animate-pulse" title="Nedostaje ključ"></div>
+                <input type="password" id="apiKeyInput" class="bg-slate-900 border border-slate-600 text-white text-xs p-2 rounded w-48 outline-none" placeholder="Unesi Gemini API Ključ..." oninput="checkApiKey()">
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- LIJEVI STUPAC - KONTROLE -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="panel space-y-4">
+                    <h2 class="text-lg font-bold text-white border-b border-slate-700 pb-2">Parametri Objekta</h2>
+                    
+                    <div>
+                        <label class="label">Tip Konstrukcije</label>
+                        <select id="tipKrova" class="input-field" onchange="izracunaj()">
+                            <option value="gable">Dvostrešni Krov (Zidani objekt)</option>
+                            <option value="mono">Jednostrešni Krov (Zidani objekt)</option>
+                            <option value="canopy_gable">Nadstrešnica na DVIJE vode (Drveni stupovi)</option>
+                            <option value="canopy">Nadstrešnica na JEDNU vodu (Drveni stupovi)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="label">Širina Tlocrta (m)</label>
+                            <input type="number" id="sirina" class="input-field" value="6" step="0.5" oninput="izracunaj()">
+                        </div>
+                        <div>
+                            <label class="label">Dužina Tlocrta (m)</label>
+                            <input type="number" id="duzina" class="input-field" value="8" step="0.5" oninput="izracunaj()">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="label">Prepust Strehe (m)</label>
+                            <input type="number" id="prepust" class="input-field" value="0.6" step="0.1" oninput="izracunaj()">
+                        </div>
+                        <div>
+                            <label class="label">Nagib Krova (°)</label>
+                            <input type="number" id="nagib" class="input-field" value="25" step="1" oninput="izracunaj()">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="label">Vrsta Pokrova</label>
+                        <select id="pokrov" class="input-field" onchange="izracunaj()">
+                            <option value="crijep">Crijep (Teški pokrov)</option>
+                            <option value="lim">Lim (Laki pokrov)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="label">Početak Radova</label>
+                            <input type="date" id="datumPocetka" class="input-field" onchange="izracunaj()">
+                        </div>
+                        <div>
+                            <label class="label">Broj Radnika</label>
+                            <input type="number" id="brojRadnika" class="input-field" value="3" min="1" max="10" oninput="izracunaj()">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="label">Opis Posla & Specifičnosti</label>
+                        <textarea id="opisPosla" class="input-field h-20 text-sm" placeholder="Npr. Skela ide na strm teren, dizalica..." oninput="izracunaj()"></textarea>
+                    </div>
+                </div>
+
+                <div class="panel bg-slate-800 border-blue-900">
+                    <h2 class="text-lg font-bold text-blue-400 mb-4">Brzi Rezultati</h2>
+                    <ul class="text-sm space-y-2 text-slate-300">
+                        <li class="flex justify-between"><span>Površina krova:</span> <strong id="res-povrsina" class="text-white">0 m²</strong></li>
+                        <li class="flex justify-between"><span>Broj rogova:</span> <strong id="res-rogovi" class="text-white">0 kom</strong></li>
+                        <li class="flex justify-between"><span>Ukupno drvene građe:</span> <strong id="res-drvo" class="text-yellow-400">0 m³</strong></li>
+                        <li class="flex justify-between"><span>Procjena trajanja:</span> <strong id="res-trajanje" class="text-green-400">0 radnih dana</strong></li>
+                    </ul>
+                    <button onclick="generatePDF()" class="btn btn-green mt-6 flex justify-center items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Preuzmi PDF Ponudu s Planom
+                    </button>
+                    
+                    <hr class="border-slate-700 my-4">
+                    <h3 class="text-sm font-bold text-blue-300 mb-2">Komunikacija s Klijentom</h3>
+                    <button onclick="generirajEmailPonudu()" id="emailBtn" class="btn btn-blue text-xs flex justify-center items-center gap-2">
+                        ✨ Generiraj Nacrt Emaila
+                    </button>
+                    <div id="email-response"></div>
+                </div>
+            </div>
+
+            <!-- DESNI STUPAC - 3D, AI i GANTOGRAM -->
+            <div class="lg:col-span-8 space-y-6">
+                <div class="panel p-2">
+                    <div class="flex justify-between px-2 pt-1 pb-2">
+                        <span class="text-xs font-bold text-slate-400 tracking-wider">3D VIZUALIZACIJA (UŽIVO)</span>
+                        <span class="text-xs text-slate-500">Koristite miš za rotaciju</span>
+                    </div>
+                    <div id="canvas-container"></div>
+                </div>
+
+                <div class="panel border-blue-500/30">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-4">
+                        <h2 class="text-lg font-bold text-blue-400 flex items-center gap-2">
+                            📅 Terminski Plan i Dinamika Radova (Gantogram)
+                        </h2>
+                        <span id="gantt-ukupno-dana" class="text-xs bg-blue-900/50 text-blue-300 px-3 py-1 rounded-full font-semibold"></span>
+                    </div>
+
+                    <div class="overflow-x-auto gantt-scroll pb-2">
+                        <div class="min-w-[650px] space-y-3" id="gantt-container"></div>
+                    </div>
+                    
+                    <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-slate-400 border-t border-slate-800 pt-3">
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-amber-600 rounded-sm"></span> Priprema i organizacija</div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-blue-600 rounded-sm"></span> Tesarski radovi (drvo)</div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-indigo-600 rounded-sm"></span> Izolacija i letvanje</div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-emerald-600 rounded-sm"></span> Pokrivanje i završetak</div>
+                    </div>
+                </div>
+
+                <div class="panel border-yellow-600/50 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-yellow-500"></div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-yellow-500 flex items-center gap-2">
+                            👷 Inženjer Horvat (AI Analiza)
+                        </h2>
+                        <button onclick="procitajNaglas()" id="ttsBtn" class="bg-yellow-500 text-slate-900 px-3 py-1 rounded text-xs font-bold hover:bg-yellow-400 transition-colors flex items-center gap-1">
+                            🔊 Slušaj (TTS)
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
+                        <button onclick="pozoviHorvata('statika')" id="horvatBtn" class="btn btn-yellow text-xs">✨ STATIKA I DETALJI</button>
+                        <button onclick="pozoviHorvata('plan')" id="horvatPlanBtn" class="btn btn-slate text-xs">📆 OPTIMIZIRAJ PLAN</button>
+                        <button onclick="generirajListuMaterijala()" id="matBtn" class="btn btn-blue text-xs">🔩 LISTA SPOJNICA</button>
+                        <button onclick="pozoviHorvata('znr')" id="znrBtn" class="btn bg-red-600 hover:bg-red-500 text-white text-xs">⚠️ ZAŠTITA NA RADU</button>
+                    </div>
+
+                    <div id="ai-response" class="bg-slate-950 p-4 rounded border border-slate-800 text-sm leading-relaxed min-h-[120px] whitespace-pre-wrap text-slate-300 mb-4">Unesite API ključ u gornjem desnom kutu i odaberite parametre krova, a zatim zatražite moju analizu.</div>
+                    
+                    <div class="flex gap-2 items-center bg-slate-900 p-2 rounded border border-slate-700">
+                        <input type="text" id="customPitanje" class="input-field border-none bg-transparent flex-1 focus:ring-0" placeholder="Pitaj Horvata specifično pitanje...">
+                        <button onclick="pitajHorvataCustom()" id="pitajBtn" class="btn btn-yellow w-auto text-sm px-4">Pitaj</button>
+                    </div>
+                </div>
+
+                <div class="panel border-purple-600/50 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+                        <h2 class="text-lg font-bold text-purple-400 flex items-center gap-2">
+                            🎨 AI Koncept Skica (Imagen 4.0)
+                        </h2>
+                        <button onclick="generirajSkicuKrova()" id="skicaBtn" class="btn bg-purple-600 hover:bg-purple-500 text-white text-xs w-auto">Generiraj Skicu</button>
+                    </div>
+                    <div id="ai-skica-container" class="bg-slate-950 rounded border border-slate-800 min-h-[250px] flex flex-col items-center justify-center text-slate-500 text-sm p-2 overflow-hidden text-center">
+                        <svg class="w-12 h-12 mb-2 text-slate-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        Kliknite 'Generiraj Skicu' za stvaranje vizualnog koncepta na temelju vaših parametara.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Component -->
+    <div id="toast">Obavijest</div>
+
+    <script>
+        let trenutniProracun = {};
+        let fazeRadova = [];
+        
+        const FIRMA = {
+            naziv: "X-TREME GRADNJA d.o.o.",
+            adresa: "Prigradska ulica, Zadvorsko, 10000 Zagreb",
+            oib: "12345678901",
+            iban: "HR1234567890123456789",
+            mob: "095 993 3900"
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const danas = new Date();
+            const godina = danas.getFullYear();
+            const mjesec = String(danas.getMonth() + 1).padStart(2, '0');
+            const dan = String(danas.getDate()).padStart(2, '0');
+            document.getElementById('datumPocetka').value = `${godina}-${mjesec}-${dan}`;
+        });
+
+        function prikaziObavijest(poruka) {
+            const toast = document.getElementById('toast');
+            toast.innerText = poruka;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function checkApiKey() {
+            const input = document.getElementById('apiKeyInput');
+            const dot = document.getElementById('api-status-dot');
+            const val = input.value.trim();
+            
+            if(val.length > 10) {
+                localStorage.setItem('xtreme_gemini_api_key', val);
+                dot.classList.remove('bg-red-500', 'animate-pulse');
+                dot.classList.add('bg-green-500');
+                dot.title = "Sustav aktivan";
+            } else {
+                localStorage.removeItem('xtreme_gemini_api_key');
+                dot.classList.remove('bg-green-500');
+                dot.classList.add('bg-red-500', 'animate-pulse');
+                dot.title = "Nedostaje ključ";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const storedKey = localStorage.getItem('xtreme_gemini_api_key');
+            if(storedKey) {
+                document.getElementById('apiKeyInput').value = storedKey;
+                checkApiKey();
+            }
+            init3D();
+            izracunaj();
+        });
+
+        function izracunaj() {
+            const tipKrova = document.getElementById('tipKrova').value;
+            const sirina = parseFloat(document.getElementById('sirina').value) || 0;
+            const duzina = parseFloat(document.getElementById('duzina').value) || 0;
+            const prepust = parseFloat(document.getElementById('prepust').value) || 0;
+            const nagib = parseFloat(document.getElementById('nagib').value) || 0;
+            const pokrov = document.getElementById('pokrov').value;
+            const opis = document.getElementById('opisPosla').value;
+            const datumPocetkaStr = document.getElementById('datumPocetka').value || new Date().toISOString().split('T')[0];
+            const brojRadnika = parseInt(document.getElementById('brojRadnika').value) || 3;
+
+            const nagibRad = nagib * (Math.PI / 180);
+            let krovSirina, krovDuzina, duzinaRoga;
+
+            if (tipKrova === 'gable' || tipKrova === 'canopy_gable') {
+                const tlocrtnaPolovica = sirina / 2;
+                duzinaRoga = (tlocrtnaPolovica / Math.cos(nagibRad)) + prepust;
+                krovSirina = duzinaRoga * 2;
+                krovDuzina = duzina + (prepust * 2);
+            } else {
+                duzinaRoga = (sirina / Math.cos(nagibRad)) + prepust;
+                krovSirina = duzinaRoga;
+                krovDuzina = duzina + (prepust * 2);
+            }
+
+            const povrsinaKrova = krovSirina * krovDuzina;
+            const razmakRogova = 0.8;
+            const brojRogovaPoStrani = Math.ceil(krovDuzina / razmakRogova) + 1;
+            const brojRogova = (tipKrova === 'gable' || tipKrova === 'canopy_gable') ? brojRogovaPoStrani * 2 : brojRogovaPoStrani;
+            
+            const metaraRog = brojRogova * duzinaRoga;
+            const m3Rog = metaraRog * (0.10 * 0.12);
+
+            const letvePoRogu = Math.ceil(duzinaRoga / 0.35);
+            const metaraLetve = letvePoRogu * krovDuzina * ((tipKrova === 'gable' || tipKrova === 'canopy_gable') ? 2 : 1);
+            const m3Letve = metaraLetve * (0.04 * 0.05);
+
+            const metaraKontraletve = brojRogova * duzinaRoga;
+            const m3Kontraletve = metaraKontraletve * (0.04 * 0.05);
+
+            let m3Daske = 0;
+            let m2Daske = 0;
+            if (pokrov === 'lim') {
+                m2Daske = povrsinaKrova * 1.1;
+                m3Daske = m2Daske * 0.024;
+            }
+
+            const ukupnoDrvoM3 = m3Rog + m3Letve + m3Kontraletve + m3Daske;
+            const radniFaktor = 3 / brojRadnika;
+            const slozenostTerena = (opis.toLowerCase().includes('strm') || opis.toLowerCase().includes('skela') || opis.toLowerCase().includes('otežan')) ? 1.3 : 1.0;
+            const zahtjevnaKonstrukcija = (tipKrova.includes('canopy')) ? 1.1 : 1.0;
+
+            const d1_priprema = Math.max(1, Math.round(1.5 * slozenostTerena));
+            const d2_konstrukcija = Math.max(1, Math.round((ukupnoDrvoM3 * 2.5 + 1.5) * radniFaktor * zahtjevnaKonstrukcija));
+            const d3_folija_letvanje = Math.max(1, Math.round((povrsinaKrova * 0.02 + 1) * radniFaktor));
+            const d4_pokrivanje = Math.max(1, Math.round((povrsinaKrova * (pokrov === 'crijep' ? 0.04 : 0.025) + 1) * radniFaktor));
+            const d5_limarija = Math.max(1, Math.round(1.5 * radniFaktor * slozenostTerena));
+
+            const ukupnoDana = d1_priprema + d2_konstrukcija + d3_folija_letvanje + d4_pokrivanje + d5_limarija;
+
+            trenutniProracun = {
+                tipKrova, sirina, duzina, prepust, nagib, vrstaPokrova: pokrov, opis,
+                povrsinaKrova: povrsinaKrova.toFixed(2),
+                brojRogova, metaraRog: metaraRog.toFixed(2), m3Rog: m3Rog.toFixed(2),
+                metaraLetve: metaraLetve.toFixed(2), m3Letve: m3Letve.toFixed(2),
+                metaraKontraletve: metaraKontraletve.toFixed(2), m3Kontraletve: m3Kontraletve.toFixed(2),
+                m2Daske: m2Daske.toFixed(2), m3Daske: m3Daske.toFixed(2),
+                ukupnoDrvoM3: ukupnoDrvoM3.toFixed(2),
+                m2Folije: (povrsinaKrova * 1.15).toFixed(2),
+                datumPocetkaStr, brojRadnika, ukupnoDana
+            };
+
+            fazeRadova = izracunajDatumeFaza(datumPocetkaStr, [
+                { id: "F1", naziv: "1. Priprema, skele i doprema", trajanje: d1_priprema, boja: "bg-amber-600" },
+                { id: "F2", naziv: "2. Postavljanje nosive drvene konstrukcije", trajanje: d2_konstrukcija, boja: "bg-blue-600" },
+                { id: "F3", naziv: "3. Daskanje, folija i letvanje", trajanje: d3_folija_letvanje, boja: "bg-indigo-600" },
+                { id: "F4", naziv: "4. Krovopokrivački radovi", trajanje: d4_pokrivanje, boja: "bg-emerald-600" },
+                { id: "F5", naziv: "5. Limarija i završni opšavi", trajanje: d5_limarija, boja: "bg-teal-600" }
+            ]);
+
+            document.getElementById('res-povrsina').innerText = `${trenutniProracun.povrsinaKrova} m²`;
+            document.getElementById('res-rogovi').innerText = `${brojRogova} kom`;
+            document.getElementById('res-drvo').innerText = `${trenutniProracun.ukupnoDrvoM3} m³`;
+            document.getElementById('res-trajanje').innerText = `${ukupnoDana} radnih dana`;
+
+            crtaj3D(tipKrova, sirina, duzina, prepust, nagib, pokrov);
+            nacrtajGantogram();
+        }
+
+        function izracunajDatumeFaza(datumPocetkaStr, fazaPredlozak) {
+            let trenutniDatum = new Date(datumPocetkaStr);
+            let rez = [];
+            
+            fazaPredlozak.forEach(faza => {
+                let start = new Date(trenutniDatum);
+                let odradjenoDana = 0;
+                let end = new Date(trenutniDatum);
+                
+                while (odradjenoDana < faza.trajanje) {
+                    if (end.getDay() !== 0) {
+                        odradjenoDana++;
+                    }
+                    if (odradjenoDana < faza.trajanje) {
+                        end.setDate(end.getDate() + 1);
+                    }
+                }
+                
+                rez.push({
+                    ...faza,
+                    startStr: start.toLocaleDateString('hr-HR', { day: '2-digit', month: '2-digit' }),
+                    endStr: end.toLocaleDateString('hr-HR', { day: '2-digit', month: '2-digit' }),
+                    startRaw: new Date(start),
+                    endRaw: new Date(end)
+                });
+                
+                trenutniDatum = new Date(end);
+                trenutniDatum.setDate(trenutniDatum.getDate() + 1);
+                while (trenutniDatum.getDay() === 0) {
+                    trenutniDatum.setDate(trenutniDatum.getDate() + 1);
+                }
+            });
+            return rez;
+        }
+
+        function nacrtajGantogram() {
+            const container = document.getElementById('gantt-container');
+            const ukupnoDanaBadge = document.getElementById('gantt-ukupno-dana');
+            
+            ukupnoDanaBadge.innerText = `Ukupno trajanje: ${trenutniProracun.ukupnoDana} radnih dana`;
+            if (fazeRadova.length === 0) return;
+            
+            const pocetniDatum = fazeRadova[0].startRaw;
+            const zavrsniDatum = fazeRadova[fazeRadova.length - 1].endRaw;
+            const kalendarskihDana = Math.ceil((zavrsniDatum - pocetniDatum) / (1000 * 60 * 60 * 24)) + 1;
+            
+            let html = `<div class="grid grid-cols-12 gap-2 text-xs font-bold text-slate-400 border-b border-slate-700 pb-1">`;
+            html += `  <div class="col-span-4">Faze i aktivnosti</div>`;
+            html += `  <div class="col-span-8 grid" style="grid-template-columns: repeat(${kalendarskihDana}, minmax(0, 1fr));">`;
+            
+            let tekuci = new Date(pocetniDatum);
+            for (let i = 0; i < kalendarskihDana; i++) {
+                const jeVikend = tekuci.getDay() === 0 || tekuci.getDay() === 6;
+                html += `    <div class="text-center text-[10px] ${jeVikend ? 'text-red-400 font-bold' : ''}" title="${tekuci.toLocaleDateString('hr-HR')}">`;
+                html += `      ${tekuci.getDate()}.${tekuci.getMonth()+1}.`;
+                html += `    </div>`;
+                tekuci.setDate(tekuci.getDate() + 1);
+            }
+            html += `  </div></div>`;
+
+            fazeRadova.forEach(faza => {
+                const odPocetka = Math.round((faza.startRaw - pocetniDatum) / (1000 * 60 * 60 * 24));
+                const trajanjeKalendarskih = Math.round((faza.endRaw - faza.startRaw) / (1000 * 60 * 60 * 24)) + 1;
+                
+                html += `<div class="grid grid-cols-12 gap-2 items-center py-1 border-b border-slate-800/50">`;
+                html += `  <div class="col-span-4 text-xs"><div class="font-medium text-slate-200">${faza.naziv}</div><div class="text-[10px] text-slate-400 font-semibold">${faza.trajanje} d (${faza.startStr}-${faza.endStr})</div></div>`;
+                html += `  <div class="col-span-8 grid relative h-6 rounded bg-slate-900/40 border border-slate-800" style="grid-template-columns: repeat(${kalendarskihDana}, minmax(0, 1fr));">`;
+                
+                let tekuciPozadina = new Date(pocetniDatum);
+                for (let i = 0; i < kalendarskihDana; i++) {
+                    html += `    <div class="h-full border-r border-slate-800/${tekuciPozadina.getDay()===0?'50 bg-red-500/10':'10'}"></div>`;
+                    tekuciPozadina.setDate(tekuciPozadina.getDate() + 1);
+                }
+                
+                html += `    <div class="absolute top-1 bottom-1 ${faza.boja} rounded-md shadow-lg flex items-center justify-center text-[10px] text-white font-bold px-1 truncate" style="grid-column: ${odPocetka + 1} / span ${trajanjeKalendarskih};">${faza.trajanje} dana</div>`;
+                html += `  </div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        let scene, camera, renderer, krovGrupa;
+
+        function init3D() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x020617);
+
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(10, 20, 10);
+            scene.add(dirLight);
+
+            krovGrupa = new THREE.Group();
+            scene.add(krovGrupa);
+
+            camera.position.set(15, 10, 15);
+            camera.lookAt(0, 0, 0);
+
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            let isDragging = false;
+            let prevMouse = { x: 0, y: 0 };
+            container.addEventListener('mousedown', () => isDragging = true);
+            window.addEventListener('mouseup', () => isDragging = false);
+            container.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    krovGrupa.rotation.y += (e.offsetX - prevMouse.x) * 0.01;
+                    krovGrupa.rotation.x += (e.offsetY - prevMouse.y) * 0.01;
+                }
+                prevMouse = { x: e.offsetX, y: e.offsetY };
+            });
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if(!document.activeElement.closest('#canvas-container')) {
+                krovGrupa.rotation.y += 0.002;
+            }
+            renderer.render(scene, camera);
+        }
+
+        function crtaj3D(tip, w, l, prepust, nagib, pokrov) {
+            if(!scene) return;
+            while(krovGrupa.children.length > 0) krovGrupa.remove(krovGrupa.children[0]);
+            krovGrupa.rotation.set(0,0,0);
+
+            const matZid = new THREE.MeshStandardMaterial({ color: 0x94a3b8 });
+            const matDrvo = new THREE.MeshStandardMaterial({ color: 0x8b5a2b });
+            const matKrov = new THREE.MeshStandardMaterial({ color: pokrov === 'crijep' ? 0x8b0000 : 0x475569, side: THREE.DoubleSide });
+            const visinaZida = 3;
+
+            if (tip.includes('canopy')) {
+                [-w/2 + 0.1, w/2 - 0.1].forEach(x => {
+                    [-l/2 + 0.1, l/2 - 0.1].forEach(z => {
+                        const stup = new THREE.Mesh(new THREE.BoxGeometry(0.2, visinaZida, 0.2), matDrvo);
+                        stup.position.set(x, visinaZida/2, z);
+                        krovGrupa.add(stup);
+                    });
+                });
+            } else {
+                const kuca = new THREE.Mesh(new THREE.BoxGeometry(w, visinaZida, l), matZid);
+                kuca.position.y = visinaZida / 2;
+                krovGrupa.add(kuca);
+            }
+
+            const nagibRad = nagib * (Math.PI / 180);
+            if (tip === 'gable' || tip === 'canopy_gable') {
+                const sirinaKrova = (w / 2) + prepust;
+                const visinaSljemena = (w / 2) * Math.tan(nagibRad);
+                const duzinaKrova = l + (prepust * 2);
+
+                const oblik = new THREE.Shape();
+                oblik.moveTo(-sirinaKrova, -prepust * Math.tan(nagibRad));
+                oblik.lineTo(0, visinaSljemena);
+                oblik.lineTo(sirinaKrova, -prepust * Math.tan(nagibRad));
+
+                const krov = new THREE.Mesh(new THREE.ExtrudeGeometry(oblik, { depth: duzinaKrova, bevelEnabled: false }), matKrov);
+                krov.position.set(0, visinaZida, -duzinaKrova/2);
+                krovGrupa.add(krov);
+            } else {
+                const sirinaKrova = w + prepust;
+                const visinaSljemena = w * Math.tan(nagibRad);
+                const duzinaKrova = l + (prepust * 2);
+                const krov = new THREE.Mesh(new THREE.PlaneGeometry(sirinaKrova, duzinaKrova), matKrov);
+                krov.rotation.x = -Math.PI / 2;
+                krov.rotation.y = -nagibRad;
+                krov.position.set(prepust/2, visinaZida + (visinaSljemena/2), 0);
+                krovGrupa.add(krov);
+            }
+        }
+
+        async function fetchGemini(prompt) {
+            const apiKey = localStorage.getItem('xtreme_gemini_api_key');
+            if(!apiKey) throw new Error("API ključ nije upisan! Unesite ga na vrhu ekrana.");
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+
+            if(!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || "Greška pri komunikaciji s API-jem.");
+            }
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        async function pozoviHorvata(mod) {
+            const res = document.getElementById('ai-response');
+            const p = trenutniProracun;
+            res.innerHTML = "Inženjer Horvat provjerava podatke...";
+            
+            let prompt = "";
+            if (mod === 'statika') {
+                prompt = `Ti si Inženjer Horvat. Analiziraj statiku krova: tip ${p.tipKrova}, dimenzije ${p.sirina}x${p.duzina}m, nagib ${p.nagib}°, prepust ${p.prepust}m, pokrov ${p.vrstaPokrova}. Napiši stručno mišljenje u 3 kratka odlomka.`;
+            } else if (mod === 'plan') {
+                prompt = `Ti si Inženjer Horvat. Analiziraj terminski plan za krov ${p.povrsinaKrova}m² s ${p.brojRadnika} radnika. Daj savjete za optimizaciju u 3 odlomka.`;
+            } else if (mod === 'znr') {
+                prompt = `Ti si Inženjer Horvat. Napiši 3 ključna upozorenja za zaštitu na radu za krov nagiba ${p.nagib}° i pokrov ${p.vrstaPokrova}.`;
+            }
+
+            try {
+                res.innerHTML = await fetchGemini(prompt);
+            } catch(e) {
+                res.innerHTML = `<span class="text-red-500 font-bold">Greška:</span> ${e.message}`;
+            }
+        }
+
+        async function pitajHorvataCustom() {
+            const input = document.getElementById('customPitanje');
+            const pitanje = input.value.trim();
+            if(!pitanje) return;
+            const res = document.getElementById('ai-response');
+            res.innerHTML = "Inženjer Horvat odgovara...";
+            try {
+                const odgovor = await fetchGemini(`Ti si Inženjer Horvat. Odgovori kratko i stručno na hrvatskom: "${pitanje}"`);
+                res.innerHTML = `<strong class="text-yellow-400">Pitanje:</strong> ${pitanje}\n\n<strong class="text-blue-400">Odgovor:</strong>\n${odgovor}`;
+                input.value = "";
+            } catch(e) {
+                res.innerHTML = `<span class="text-red-500 font-bold">Greška:</span> ${e.message}`;
+            }
+        }
+
+        async function generirajSkicuKrova() {
+            const apiKey = localStorage.getItem('xtreme_gemini_api_key');
+            if(!apiKey) { prikaziObavijest("Unesite API ključ!"); return; }
+            const container = document.getElementById('ai-skica-container');
+            container.innerHTML = `<div class="p-8"><span class="loader w-10 h-10 border-purple-500"></span><p class="text-purple-300 mt-2">Imagen 4.0 generira skicu...</p></div>`;
+            const p = trenutniProracun;
+            const prompt = `Photorealistic architectural visualization of a roof structure, ${p.nagib} degree pitch, ${p.vrstaPokrova}, professional 4k rendering.`;
+            
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ instances: { prompt }, parameters: { sampleCount: 1 } })
+                });
+                const result = await resp.json();
+                if (result.predictions?.[0]?.bytesBase64Encoded) {
+                    container.innerHTML = `<img src="data:image/png;base64,${result.predictions[0].bytesBase64Encoded}" class="w-full h-auto rounded-lg shadow-lg border border-purple-800">`;
+                } else {
+                    throw new Error("Greška kod generiranja slike.");
+                }
+            } catch(e) {
+                container.innerHTML = `<div class="text-red-400 p-4">Greška: ${e.message}</div>`;
+            }
+        }
+
+        async function generirajListuMaterijala() {
+            const res = document.getElementById('ai-response');
+            const p = trenutniProracun;
+            res.innerHTML = "Generiram listu spojnica...";
+            try {
+                res.innerHTML = await fetchGemini(`Navedi specifikaciju spojnog materijala (vijci, kutnici, sidra) za krov ${p.tipKrova} površine ${p.povrsinaKrova}m2 na hrvatskom.`);
+            } catch(e) {
+                res.innerHTML = `<span class="text-red-500 font-bold">Greška:</span> ${e.message}`;
+            }
+        }
+
+        function pcmToWav(pcmData, sampleRate) {
+            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(buffer);
+            const writeStr = (off, s) => { for(let i=0; i<s.length; i++) view.setUint8(off+i, s.charCodeAt(i)); };
+            writeStr(0, 'RIFF'); view.setUint32(4, 36 + pcmData.length * 2, true); writeStr(8, 'WAVE');
+            writeStr(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true); writeStr(36, 'data'); view.setUint32(40, pcmData.length * 2, true);
+            for(let i=0; i<pcmData.length; i++) view.setInt16(44 + i * 2, pcmData[i], true);
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        async function procitajNaglas() {
+            const text = document.getElementById('ai-response').innerText;
+            const apiKey = localStorage.getItem('xtreme_gemini_api_key');
+            if(!apiKey) { prikaziObavijest("Nedostaje API ključ."); return; }
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text }] }],
+                        generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } } },
+                        model: "gemini-2.5-flash-preview-tts"
+                    })
+                });
+                const res = await resp.json();
+                const audioData = res?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+                const mime = res?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType;
+                if(audioData) {
+                    const sampleRate = parseInt(mime.match(/rate=(\d+)/)[1], 10) || 24000;
+                    const raw = window.atob(audioData);
+                    const bytes = new Uint8Array(raw.length);
+                    for(let i=0; i<raw.length; i++) bytes[i] = raw.charCodeAt(i);
+                    const wav = pcmToWav(new Int16Array(bytes.buffer), sampleRate);
+                    new Audio(URL.createObjectURL(wav)).play();
+                }
+            } catch(e) {
+                prikaziObavijest("TTS Greška: " + e.message);
+            }
+        }
+
+        async function generirajEmailPonudu() {
+            const apiKey = localStorage.getItem('xtreme_gemini_api_key');
+            if(!apiKey) { prikaziObavijest("Unesite API ključ!"); return; }
+            const res = document.getElementById('email-response');
+            const p = trenutniProracun;
+            res.innerHTML = "Pišem e-mail...";
+            try {
+                const odgovor = await fetchGemini(`Napiši poslovni email klijentu za ponudu krova površine ${p.povrsinaKrova}m2, trajanja ${p.ukupnoDana} dana, početak ${p.datumPocetkaStr}. Profesionalno na hrvatskom.`);
+                res.innerHTML = `<div class="bg-slate-900 p-3 mt-3 rounded text-sm text-slate-300 border border-slate-700 whitespace-pre-wrap" id="emailDraft">${odgovor}</div><button onclick="kopirajEmail()" class="mt-2 w-full py-2 bg-slate-700 text-white rounded text-xs font-bold">Kopiraj</button>`;
+            } catch(e) {
+                res.innerHTML = `<span class="text-red-500">${e.message}</span>`;
+            }
+        }
+
+        function kopirajEmail() {
+            const text = document.getElementById('emailDraft')?.innerText;
+            if(text) {
+                const ta = document.createElement('textarea'); ta.value = text;
+                document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+                document.body.removeChild(ta); prikaziObavijest('Kopirano u međuspremnik!');
+            }
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const p = trenutniProracun;
+            doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor(37, 99, 235);
+            doc.text("INFORMATIVNA PONUDA", 105, 20, null, null, "center");
+            doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(50, 50, 50);
+            doc.text(FIRMA.naziv, 20, 35); doc.text(FIRMA.adresa, 20, 42); doc.text(`OIB: ${FIRMA.oib}`, 20, 49);
+            doc.line(20, 55, 190, 55);
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.text("Specifikacija Krovišta", 20, 65);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+            let y = 75;
+            [
+                `Tip: ${p.tipKrova}`, `Dimenzije: ${p.sirina}m x ${p.duzina}m`, `Nagib: ${p.nagib}°`,
+                `Površina: ${p.povrsinaKrova} m2`, `Pokrov: ${p.vrstaPokrova}`, `Ukupno drva: ${p.ukupnoDrvoM3} m3`,
+                `Radnici: ${p.brojRadnika}`, `Trajanje radova: ${p.ukupnoDana} radnih dana`
+            ].forEach(line => { doc.text(line, 20, y); y += 7; });
+            doc.save(`X-TREME_Ponuda_${new Date().toISOString().split('T')[0]}.pdf`);
+            prikaziObavijest("PDF preuzet!");
+        }
+    </script>
+</body>
+</html>
