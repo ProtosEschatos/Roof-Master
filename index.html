@@ -208,6 +208,28 @@
                     </div>
                 </div>
 
+                <div class="panel border-green-600/50">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-4">
+                        <h2 class="text-lg font-bold text-green-400 flex items-center gap-2">📋 Popis Materijala</h2>
+                        <button onclick="generatePDF()" class="btn btn-green text-xs w-auto px-3">⬇ PDF</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse" id="popis-tablica">
+                            <thead>
+                                <tr class="text-xs text-slate-400 border-b border-slate-700">
+                                    <th class="text-left py-2 pr-2">Materijal</th>
+                                    <th class="text-right py-2 px-2">Količina</th>
+                                    <th class="text-right py-2 px-2">Jed. mjera</th>
+                                    <th class="text-right py-2 px-2">Jed. cijena</th>
+                                    <th class="text-right py-2 pl-2">Ukupno</th>
+                                </tr>
+                            </thead>
+                            <tbody id="popis-body" class="text-slate-300"></tbody>
+                            <tfoot id="popis-foot" class="text-white font-bold border-t-2 border-slate-600"></tfoot>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="panel border-yellow-600/50 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-yellow-500"></div>
                     <div class="flex justify-between items-center mb-4">
@@ -418,6 +440,9 @@
 
             trenutniProracun.troskovi = { tDrvo, tPokrov, tFolija, tRad, tSkela, tOstalo, tUkupno, tPdv, tSPdv };
 
+            // --- POPIS MATERIJALA ---
+            azurirajPopis();
+
             fazeRadova = izracunajDatumeFaza(datumPocetkaStr, [
                 { id: "F1", naziv: "1. Priprema, skele i doprema", trajanje: d1_priprema, boja: "bg-amber-600" },
                 { id: "F2", naziv: "2. Postavljanje nosive drvene konstrukcije", trajanje: d2_konstrukcija, boja: "bg-blue-600" },
@@ -433,6 +458,59 @@
 
             crtaj3D(tipKrova, sirina, duzina, prepust, nagib, pokrov);
             nacrtajGantogram();
+        }
+
+        function azurirajPopis() {
+            const p = trenutniProracun;
+            const cDrvo   = parseFloat(document.getElementById('cDrvo').value)   || 0;
+            const cPokrov = parseFloat(document.getElementById('cPokrov').value) || 0;
+            const cFolija = parseFloat(document.getElementById('cFolija').value) || 0;
+            const cRad    = parseFloat(document.getElementById('cRad').value)    || 0;
+            const cSkela  = parseFloat(document.getElementById('cSkela').value)  || 0;
+            const cOstalo = parseFloat(document.getElementById('cOstalo').value) || 0;
+
+            const fmtN = (v, dec=2) => parseFloat(v).toFixed(dec);
+            const fmtE = v => v > 0 ? v.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €' : '—';
+
+            const stavke = [
+                { naziv: 'Rogovi 10×12 cm', kolicina: fmtN(p.metaraRog), jed: 'm', cijena: cDrvo ? (parseFloat(p.m3Rog) * cDrvo) : 0, napomena: `(${p.brojRogova} kom × ${fmtN(parseFloat(p.metaraRog)/p.brojRogova)}m = ${fmtN(p.m3Rog)} m³)` },
+                { naziv: 'Letve 4×5 cm', kolicina: fmtN(p.metaraLetve), jed: 'm', cijena: cDrvo ? (parseFloat(p.m3Letve) * cDrvo) : 0, napomena: `(${fmtN(p.m3Letve)} m³)` },
+                { naziv: 'Kontra-letve 4×5 cm', kolicina: fmtN(p.metaraKontraletve), jed: 'm', cijena: cDrvo ? (parseFloat(p.m3Kontraletve) * cDrvo) : 0, napomena: `(${fmtN(p.m3Kontraletve)} m³)` },
+            ];
+            if (parseFloat(p.m2Daske) > 0) {
+                stavke.push({ naziv: 'Daske (podloga za lim)', kolicina: fmtN(p.m2Daske), jed: 'm²', cijena: cDrvo ? (parseFloat(p.m3Daske) * cDrvo) : 0, napomena: `(${fmtN(p.m3Daske)} m³)` });
+            }
+            stavke.push({ naziv: '— UKUPNO drvena građa —', kolicina: fmtN(p.ukupnoDrvoM3), jed: 'm³', cijena: cDrvo ? (parseFloat(p.ukupnoDrvoM3) * cDrvo) : 0, bold: true });
+            stavke.push({ naziv: `Folija (s preklopom 15%)`, kolicina: fmtN(p.m2Folije), jed: 'm²', cijena: cFolija ? (parseFloat(p.m2Folije) * cFolija) : 0 });
+            stavke.push({ naziv: `Pokrov — ${p.vrstaPokrova}`, kolicina: fmtN(p.povrsinaKrova), jed: 'm²', cijena: cPokrov ? (parseFloat(p.povrsinaKrova) * cPokrov) : 0 });
+            stavke.push({ naziv: `Radna snaga (${p.ukupnoDana} dana × ${p.brojRadnika} radnika)`, kolicina: p.ukupnoDana * p.brojRadnika, jed: 'dan/osoba', cijena: cRad ? (p.ukupnoDana * p.brojRadnika * cRad) : 0 });
+            if (cSkela > 0) stavke.push({ naziv: 'Skela / Dizalica', kolicina: 1, jed: 'paušal', cijena: cSkela });
+            if (cOstalo > 0) stavke.push({ naziv: 'Ostalo', kolicina: 1, jed: 'paušal', cijena: cOstalo });
+
+            const body = document.getElementById('popis-body');
+            const foot = document.getElementById('popis-foot');
+            body.innerHTML = stavke.map(s => `
+                <tr class="border-b border-slate-800 hover:bg-slate-800/40 ${s.bold ? 'bg-slate-800/60 text-white font-semibold' : ''}">
+                    <td class="py-2 pr-2">${s.naziv}${s.napomena ? '<br><span class="text-xs text-slate-500">'+s.napomena+'</span>' : ''}</td>
+                    <td class="text-right py-2 px-2 font-mono">${s.kolicina}</td>
+                    <td class="text-right py-2 px-2 text-slate-400">${s.jed}</td>
+                    <td class="text-right py-2 px-2 text-slate-400">${s.cijena && cDrvo || cPokrov || cFolija || cRad || cSkela || cOstalo ? (s.bold ? '—' : (s.cijena > 0 ? (s.cijena / (parseFloat(s.kolicina)||1)).toLocaleString('hr-HR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €' : '—')) : '—'}</td>
+                    <td class="text-right py-2 pl-2 ${s.bold ? 'text-yellow-400' : 'text-white'}">${fmtE(s.cijena)}</td>
+                </tr>`).join('');
+
+            const tUkupno = stavke.reduce((sum, s) => sum + (s.cijena||0), 0);
+            if (tUkupno > 0) {
+                const pdv = tUkupno * 0.25;
+                foot.innerHTML = `
+                    <tr><td colspan="4" class="pt-3 text-slate-300">Ukupno (bez PDV-a)</td><td class="text-right pt-3 text-yellow-400">${fmtE(tUkupno)}</td></tr>
+                    <tr><td colspan="4" class="text-slate-400 text-xs">PDV 25%</td><td class="text-right text-slate-400 text-xs">${fmtE(pdv)}</td></tr>
+                    <tr><td colspan="4" class="text-green-400 pt-1">UKUPNO S PDV-om</td><td class="text-right text-green-400 text-base">${fmtE(tUkupno + pdv)}</td></tr>`;
+            } else {
+                foot.innerHTML = '';
+            }
+
+            // Spremi u trenutniProracun za PDF
+            trenutniProracun.popisStavke = stavke;
         }
 
         function izracunajDatumeFaza(datumPocetkaStr, fazaPredlozak) {
@@ -868,6 +946,68 @@
                 doc.text(`PDV 25%:`, 18, y); doc.text(fmt2(tr.tPdv), 150, y); y += 6;
                 doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(20, 140, 60);
                 doc.text("UKUPNO S PDV-om:", 18, y); doc.text(fmt2(tr.tSPdv), 150, y);
+            }
+
+            // Stranica 2: Popis materijala (detaljna tablica)
+            if (p.popisStavke && p.popisStavke.length > 0) {
+                doc.addPage();
+                let y2 = 18;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(37, 99, 235);
+                doc.text("POPIS MATERIJALA — DETALJNA SPECIFIKACIJA", 105, y2, null, null, "center");
+                y2 += 8;
+                doc.setDrawColor(37, 99, 235); doc.setLineWidth(0.5); doc.line(15, y2, 195, y2); y2 += 6;
+
+                // Zaglavlje tablice
+                doc.setFillColor(30, 41, 59); doc.rect(15, y2-4, 180, 8, 'F');
+                doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(148, 163, 184);
+                doc.text("MATERIJAL", 17, y2+1);
+                doc.text("KOLIČINA", 115, y2+1, null, null, "right");
+                doc.text("JED.", 130, y2+1, null, null, "right");
+                doc.text("JED. CIJ.", 158, y2+1, null, null, "right");
+                doc.text("UKUPNO", 192, y2+1, null, null, "right");
+                y2 += 9;
+
+                const fmtE2 = v => v > 0 ? v.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €' : '—';
+                let redBroj = 0;
+                let grandTotal = 0;
+                p.popisStavke.forEach(s => {
+                    if (y2 > 270) { doc.addPage(); y2 = 20; }
+                    if (redBroj % 2 === 0) { doc.setFillColor(15, 23, 42); doc.rect(15, y2-3.5, 180, 7, 'F'); }
+                    const bold = s.bold || false;
+                    doc.setFont("helvetica", bold ? "bold" : "normal");
+                    doc.setFontSize(8.5);
+                    doc.setTextColor(bold ? 255 : 220, bold ? 255 : 220, bold ? 255 : 220);
+                    doc.text(s.naziv, 17, y2);
+                    doc.text(String(s.kolicina), 115, y2, null, null, "right");
+                    doc.text(s.jed, 130, y2, null, null, "right");
+                    // Jedinična cijena
+                    const ukupnoCijene = s.cijena || 0;
+                    const jedCijena = ukupnoCijene > 0 && parseFloat(s.kolicina) > 0 && !bold ? ukupnoCijene / parseFloat(s.kolicina) : 0;
+                    doc.setTextColor(150, 150, 180);
+                    doc.text(jedCijena > 0 ? jedCijena.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €' : '—', 158, y2, null, null, "right");
+                    doc.setTextColor(bold ? 250 : 200, bold ? 220 : 200, bold ? 50 : 200);
+                    doc.text(fmtE2(ukupnoCijene), 192, y2, null, null, "right");
+                    if (!bold) grandTotal += ukupnoCijene;
+                    y2 += 7;
+                    redBroj++;
+                });
+
+                if (grandTotal > 0) {
+                    y2 += 3;
+                    doc.setDrawColor(37, 99, 235); doc.setLineWidth(0.4); doc.line(15, y2, 195, y2); y2 += 6;
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(240, 200, 50);
+                    doc.text("SVEUKUPNO (bez PDV-a):", 17, y2);
+                    doc.text(grandTotal.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €', 192, y2, null, null, "right");
+                    y2 += 7;
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(130, 130, 130);
+                    const pdv2 = grandTotal * 0.25;
+                    doc.text("PDV 25%:", 17, y2);
+                    doc.text(pdv2.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €', 192, y2, null, null, "right");
+                    y2 += 7;
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(50, 200, 100);
+                    doc.text("UKUPNO S PDV-om:", 17, y2);
+                    doc.text((grandTotal + pdv2).toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €', 192, y2, null, null, "right");
+                }
             }
 
             doc.save(`Kroviste_Proracun_${new Date().toISOString().split('T')[0]}.pdf`);
