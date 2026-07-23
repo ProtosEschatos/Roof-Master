@@ -697,20 +697,75 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const p = trenutniProracun;
-            doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor(37, 99, 235);
-            doc.text("INFORMATIVNA PONUDA", 105, 20, null, null, "center");
-            doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(50, 50, 50);
-            doc.text(FIRMA.naziv, 20, 35); doc.text(FIRMA.adresa, 20, 42); doc.text(`OIB: ${FIRMA.oib}`, 20, 49);
-            doc.line(20, 55, 190, 55);
-            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.text("Specifikacija Krovišta", 20, 65);
-            doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-            let y = 75;
-            [
-                `Tip: ${p.tipKrova}`, `Dimenzije: ${p.sirina}m x ${p.duzina}m`, `Nagib: ${p.nagib}°`,
-                `Površina: ${p.povrsinaKrova} m2`, `Pokrov: ${p.vrstaPokrova}`, `Ukupno drva: ${p.ukupnoDrvoM3} m3`,
-                `Radnici: ${p.brojRadnika}`, `Trajanje radova: ${p.ukupnoDana} radnih dana`
-            ].forEach(line => { doc.text(line, 20, y); y += 7; });
-            doc.save(`X-TREME_Ponuda_${new Date().toISOString().split('T')[0]}.pdf`);
+            const datum = new Date().toLocaleDateString('hr-HR');
+
+            // Naslov
+            doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(37, 99, 235);
+            doc.text("IZVJEŠTAJ PRORAČUNA KROVIŠTA", 105, 18, null, null, "center");
+            doc.setFontSize(10); doc.setTextColor(100, 100, 100);
+            doc.text(`Datum: ${datum}`, 105, 25, null, null, "center");
+            doc.setDrawColor(37, 99, 235); doc.setLineWidth(0.5); doc.line(15, 28, 195, 28);
+
+            let y = 36;
+            const naslov = (txt) => {
+                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(37, 99, 235);
+                doc.text(txt, 15, y); y += 6;
+                doc.setDrawColor(180, 200, 240); doc.setLineWidth(0.2); doc.line(15, y, 195, y); y += 4;
+            };
+            const redak = (label, value) => {
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50, 50, 50);
+                doc.text(label, 18, y);
+                doc.setFont("helvetica", "bold"); doc.setTextColor(20, 20, 20);
+                doc.text(value, 130, y); y += 6;
+            };
+
+            // Dimenzije i tip
+            naslov("1. DIMENZIJE I TIP KROVIŠTA");
+            redak("Tip krovišta:", p.tipKrova);
+            redak("Širina tlocrta:", `${p.sirina} m`);
+            redak("Dužina tlocrta:", `${p.duzina} m`);
+            redak("Nagib:", `${p.nagib}°`);
+            redak("Prepust:", `${p.prepust} m`);
+            redak("Vrsta pokrova:", p.vrstaPokrova);
+            if (p.opis) { redak("Napomena:", p.opis); }
+            y += 2;
+
+            // Površine
+            naslov("2. POVRŠINE");
+            redak("Površina krovišta:", `${p.povrsinaKrova} m²`);
+            redak("Folija (s preklopom 15%):", `${p.m2Folije} m²`);
+            if (parseFloat(p.m2Daske) > 0) { redak("Daske (s otpadom 10%):", `${p.m2Daske} m²`); }
+            y += 2;
+
+            // Drvena građa
+            naslov("3. DRVENA GRAĐA — SPECIFIKACIJA");
+            redak("Rogovi — broj:", `${p.brojRogova} kom`);
+            redak("Rogovi — dužina:", `${p.metaraRog} m`);
+            redak("Rogovi — volumen (10×12 cm):", `${p.m3Rog} m³`);
+            redak("Letve — dužina:", `${p.metaraLetve} m`);
+            redak("Letve — volumen (4×5 cm):", `${p.m3Letve} m³`);
+            redak("Kontra-letve — dužina:", `${p.metaraKontraletve} m`);
+            redak("Kontra-letve — volumen (4×5 cm):", `${p.m3Kontraletve} m³`);
+            if (parseFloat(p.m3Daske) > 0) { redak("Daske — volumen:", `${p.m3Daske} m³`); }
+            doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(220, 50, 50);
+            doc.text(`UKUPNO DRVENE GRAĐE: ${p.ukupnoDrvoM3} m³`, 18, y); y += 8;
+
+            // Terminski plan
+            if (y > 240) { doc.addPage(); y = 20; }
+            naslov("4. TERMINSKI PLAN");
+            redak("Broj radnika:", `${p.brojRadnika}`);
+            redak("Datum početka:", p.datumPocetkaStr);
+            redak("Ukupno trajanje:", `${p.ukupnoDana} radnih dana`);
+            y += 2;
+            fazeRadova.forEach(f => {
+                doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(50, 50, 50);
+                doc.text(`${f.naziv}`, 18, y);
+                doc.setFont("helvetica", "bold");
+                doc.text(`${f.startStr} – ${f.endStr}  (${f.trajanje} dana)`, 130, y);
+                y += 6;
+            });
+
+            doc.save(`Kroviste_Proracun_${new Date().toISOString().split('T')[0]}.pdf`);
             prikaziObavijest("PDF preuzet!");
         }
     </script>
