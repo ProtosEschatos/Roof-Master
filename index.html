@@ -255,12 +255,19 @@
             }
         }
 
+        // Zadani (ugrađeni) Gemini API ključ — koristi se ako korisnik nije unio svoj.
+        // Napomena: ključ je javno vidljiv u statičkom HTML-u (client-side Gemini app).
+        const DEFAULT_API_KEY = "AQ.Ab8RN6LV7SosOSvnodXhQ6m3uAGwqmcA5vbIY91nuCC7XvX-wg";
+
         window.addEventListener('DOMContentLoaded', () => {
-            const storedKey = localStorage.getItem('xtreme_gemini_api_key');
-            if(storedKey) {
-                document.getElementById('apiKeyInput').value = storedKey;
-                checkApiKey();
+            let storedKey = localStorage.getItem('xtreme_gemini_api_key');
+            // Ako nema spremljenog ključa, koristi zadani i spremi ga.
+            if(!storedKey) {
+                storedKey = DEFAULT_API_KEY;
+                localStorage.setItem('xtreme_gemini_api_key', storedKey);
             }
+            document.getElementById('apiKeyInput').value = storedKey;
+            checkApiKey();
             init3D();
             izracunaj();
         });
