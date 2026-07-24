@@ -114,42 +114,71 @@
 
                 <div class="panel space-y-4">
                     <h2 class="text-lg font-bold text-white border-b border-slate-700 pb-2">💰 Cijene Materijala</h2>
-                    <p class="text-xs text-slate-500">Unesite cijene za automatski troškovnik</p>
+                    <p class="text-xs text-slate-500">Unesite cijene — količine se računaju automatski</p>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-4">
                         <div>
-                            <label class="label">Drvo — cijena (€/m³)</label>
-                            <input type="number" id="cDrvo" class="input-field" value="0" min="0" step="10" oninput="izracunaj()">
+                            <p class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">🪵 Drvena Konstrukcija</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="label">Drvo — sve vrste (€/m³)</label><input type="number" id="cDrvo" class="input-field" value="0" min="0" step="10" oninput="izracunaj()"></div>
+                            </div>
                         </div>
+
                         <div>
-                            <label class="label">Pokrov — cijena (€/m²)</label>
-                            <input type="number" id="cPokrov" class="input-field" value="0" min="0" step="1" oninput="izracunaj()">
+                            <p class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">📦 Ploče</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="label">OSB ploče 18mm (€/m²)</label><input type="number" id="cOSB" class="input-field" value="0" min="0" step="1" oninput="izracunaj()"></div>
+                            </div>
                         </div>
+
                         <div>
-                            <label class="label">Folija — cijena (€/m²)</label>
-                            <input type="number" id="cFolija" class="input-field" value="0" min="0" step="0.5" oninput="izracunaj()">
+                            <p class="text-xs font-bold text-green-400 uppercase tracking-wider mb-2">🏠 Pokrivanje &amp; Izolacija</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="label">Pokrov (€/m²)</label><input type="number" id="cPokrov" class="input-field" value="0" min="0" step="1" oninput="izracunaj()"></div>
+                                <div><label class="label">Folija (€/m²)</label><input type="number" id="cFolija" class="input-field" value="0" min="0" step="0.5" oninput="izracunaj()"></div>
+                                <div><label class="label">Sljemenjaci (€/m)</label><input type="number" id="cSljemenjak" class="input-field" value="0" min="0" step="1" oninput="izracunaj()"></div>
+                                <div><label class="label">Zabatni opšav (€/m)</label><input type="number" id="cZabat" class="input-field" value="0" min="0" step="1" oninput="izracunaj()"></div>
+                            </div>
                         </div>
+
                         <div>
-                            <label class="label">Rad (€/dan/radnik)</label>
-                            <input type="number" id="cRad" class="input-field" value="0" min="0" step="10" oninput="izracunaj()">
+                            <p class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">🔩 Spojni Materijal</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="label">Ekseri 4.2×100mm (€/kg)</label><input type="number" id="cEkseri" class="input-field" value="0" min="0" step="0.5" oninput="izracunaj()"></div>
+                                <div><label class="label">Vijci 4×60mm (€/100 kom)</label><input type="number" id="cVijci" class="input-field" value="0" min="0" step="1" oninput="izracunaj()"></div>
+                                <div><label class="label">Kutnici/Ankeri (€/kom)</label><input type="number" id="cKutnici" class="input-field" value="0" min="0" step="0.1" oninput="izracunaj()"></div>
+                            </div>
                         </div>
+
                         <div>
-                            <label class="label">Skela / Dizalica (€)</label>
-                            <input type="number" id="cSkela" class="input-field" value="0" min="0" step="50" oninput="izracunaj()">
+                            <p class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">💧 Olučni Sustav</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="label">Oluk polutka (€/m)</label><input type="number" id="cOluk" class="input-field" value="0" min="0" step="0.5" oninput="izracunaj()"></div>
+                                <div><label class="label">Prihvatnice oljuka (€/kom)</label><input type="number" id="cPrihvatnica" class="input-field" value="0" min="0" step="0.5" oninput="izracunaj()"></div>
+                                <div><label class="label">Slivnik + koljena (€/kom)</label><input type="number" id="cSlivnik" class="input-field" value="0" min="0" step="1" oninput="izracunaj()"></div>
+                            </div>
                         </div>
+
                         <div>
-                            <label class="label">Ostalo / Paušal (€)</label>
-                            <input type="number" id="cOstalo" class="input-field" value="0" min="0" step="50" oninput="izracunaj()">
+                            <p class="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-2">👷 Radovi &amp; Ostalo</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="label">Rad (€/dan/radnik)</label><input type="number" id="cRad" class="input-field" value="0" min="0" step="10" oninput="izracunaj()"></div>
+                                <div><label class="label">Skela / Dizalica (€)</label><input type="number" id="cSkela" class="input-field" value="0" min="0" step="50" oninput="izracunaj()"></div>
+                                <div><label class="label">Ostalo / Paušal (€)</label><input type="number" id="cOstalo" class="input-field" value="0" min="0" step="50" oninput="izracunaj()"></div>
+                            </div>
                         </div>
                     </div>
 
                     <div id="troskovi-panel" class="hidden bg-slate-950 rounded-lg p-3 border border-slate-700 space-y-1 text-sm">
                         <div class="flex justify-between text-slate-400"><span>Drvena građa:</span><strong id="t-drvo" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>OSB ploče:</span><strong id="t-osb" class="text-white">0 €</strong></div>
                         <div class="flex justify-between text-slate-400"><span>Pokrov:</span><strong id="t-pokrov" class="text-white">0 €</strong></div>
                         <div class="flex justify-between text-slate-400"><span>Folija:</span><strong id="t-folija" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>Sljemenjaci+opšav:</span><strong id="t-slje" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>Spojni mat.:</span><strong id="t-spoj" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>Olučni sustav:</span><strong id="t-oluk" class="text-white">0 €</strong></div>
                         <div class="flex justify-between text-slate-400"><span>Radna snaga:</span><strong id="t-rad" class="text-white">0 €</strong></div>
-                        <div class="flex justify-between text-slate-400"><span>Skela/Dizalica:</span><strong id="t-skela" class="text-white">0 €</strong></div>
-                        <div class="flex justify-between text-slate-400"><span>Ostalo:</span><strong id="t-ostalo" class="text-white">0 €</strong></div>
+                        <div class="flex justify-between text-slate-400"><span>Skela/Ostalo:</span><strong id="t-skela" class="text-white">0 €</strong></div>
                         <div class="border-t border-slate-600 pt-2 mt-2 flex justify-between"><span class="font-bold text-white">UKUPNO:</span><strong id="t-ukupno" class="text-yellow-400 text-base">0 €</strong></div>
                         <div class="flex justify-between text-slate-500 text-xs"><span>PDV (25%):</span><span id="t-pdv">0 €</span></div>
                         <div class="flex justify-between text-xs"><span class="text-slate-400">UKUPNO s PDV-om:</span><strong id="t-ukupno-pdv" class="text-green-400">0 €</strong></div>
@@ -400,37 +429,68 @@
                 m2Daske: m2Daske.toFixed(2), m3Daske: m3Daske.toFixed(2),
                 ukupnoDrvoM3: ukupnoDrvoM3.toFixed(2),
                 m2Folije: (povrsinaKrova * 1.15).toFixed(2),
-                datumPocetkaStr, brojRadnika, ukupnoDana
+                datumPocetkaStr, brojRadnika, ukupnoDana,
+                // raw geometrija za popis
+                duzinaRoga: duzinaRoga.toFixed(2),
+                krovDuzina: krovDuzina.toFixed(2),
+                letvePoRogu
             };
 
             // --- TROŠKOVNIK ---
-            const cDrvo   = parseFloat(document.getElementById('cDrvo').value)   || 0;
-            const cPokrov = parseFloat(document.getElementById('cPokrov').value) || 0;
-            const cFolija = parseFloat(document.getElementById('cFolija').value) || 0;
-            const cRad    = parseFloat(document.getElementById('cRad').value)    || 0;
-            const cSkela  = parseFloat(document.getElementById('cSkela').value)  || 0;
-            const cOstalo = parseFloat(document.getElementById('cOstalo').value) || 0;
+            const cDrvo        = parseFloat(document.getElementById('cDrvo').value)        || 0;
+            const cOSB         = parseFloat(document.getElementById('cOSB').value)         || 0;
+            const cPokrov      = parseFloat(document.getElementById('cPokrov').value)      || 0;
+            const cFolija      = parseFloat(document.getElementById('cFolija').value)      || 0;
+            const cSljemenjak  = parseFloat(document.getElementById('cSljemenjak').value)  || 0;
+            const cZabat       = parseFloat(document.getElementById('cZabat').value)       || 0;
+            const cEkseri      = parseFloat(document.getElementById('cEkseri').value)      || 0;
+            const cVijci       = parseFloat(document.getElementById('cVijci').value)       || 0;
+            const cKutnici     = parseFloat(document.getElementById('cKutnici').value)     || 0;
+            const cOluk        = parseFloat(document.getElementById('cOluk').value)        || 0;
+            const cPrihvatnica = parseFloat(document.getElementById('cPrihvatnica').value) || 0;
+            const cSlivnik     = parseFloat(document.getElementById('cSlivnik').value)     || 0;
+            const cRad         = parseFloat(document.getElementById('cRad').value)         || 0;
+            const cSkela       = parseFloat(document.getElementById('cSkela').value)       || 0;
+            const cOstalo      = parseFloat(document.getElementById('cOstalo').value)      || 0;
 
-            const tDrvo   = ukupnoDrvoM3 * cDrvo;
-            const tPokrov = povrsinaKrova * cPokrov;
-            const tFolija = parseFloat(trenutniProracun.m2Folije) * cFolija;
-            const tRad    = ukupnoDana * brojRadnika * cRad;
-            const tSkela  = cSkela;
-            const tOstalo = cOstalo;
-            const tUkupno = tDrvo + tPokrov + tFolija + tRad + tSkela + tOstalo;
-            const tPdv    = tUkupno * 0.25;
-            const tSPdv   = tUkupno + tPdv;
+            // Količine za nove stavke
+            const m2OSB        = parseFloat(trenutniProracun.povrsinaKrova) * 1.1;
+            const sljeDuzina   = (tipKrova === 'gable' || tipKrova === 'canopy_gable') ? duzina : 0;
+            const zabatDuzina  = (tipKrova === 'gable' || tipKrova === 'canopy_gable') ? duzinaRoga * 4 : duzinaRoga * 2;
+            const kgEkseri     = ukupnoDrvoM3 * 1.5;
+            const komVijci     = letvePoRogu * brojRogova * 2;
+            const komKutnici   = brojRogova * 2;
+            const straniceOluka = (tipKrova === 'gable' || tipKrova === 'canopy_gable') ? 2 : 1;
+            const olukDuzina   = krovDuzina * straniceOluka;
+            const komPrihvatnica = Math.ceil(olukDuzina / 0.5);
+            const komSlivnik   = Math.max(2, Math.ceil(olukDuzina / 8));
+
+            const tDrvo    = ukupnoDrvoM3 * cDrvo;
+            const tOSB     = m2OSB * cOSB;
+            const tPokrov  = povrsinaKrova * cPokrov;
+            const tFolija  = parseFloat(trenutniProracun.m2Folije) * cFolija;
+            const tSlje    = sljeDuzina * cSljemenjak + zabatDuzina * cZabat;
+            const tSpoj    = kgEkseri * cEkseri + (komVijci / 100) * cVijci + komKutnici * cKutnici;
+            const tOluk    = olukDuzina * cOluk + komPrihvatnica * cPrihvatnica + komSlivnik * cSlivnik;
+            const tRad     = ukupnoDana * brojRadnika * cRad;
+            const tSkela   = cSkela + cOstalo;
+            const tUkupno  = tDrvo + tOSB + tPokrov + tFolija + tSlje + tSpoj + tOluk + tRad + tSkela;
+            const tPdv     = tUkupno * 0.25;
+            const tSPdv    = tUkupno + tPdv;
 
             const fmt = v => v > 0 ? v.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €' : '0 €';
 
             if (tUkupno > 0) {
                 document.getElementById('troskovi-panel').classList.remove('hidden');
                 document.getElementById('t-drvo').innerText   = fmt(tDrvo);
+                document.getElementById('t-osb').innerText    = fmt(tOSB);
                 document.getElementById('t-pokrov').innerText = fmt(tPokrov);
                 document.getElementById('t-folija').innerText = fmt(tFolija);
+                document.getElementById('t-slje').innerText   = fmt(tSlje);
+                document.getElementById('t-spoj').innerText   = fmt(tSpoj);
+                document.getElementById('t-oluk').innerText   = fmt(tOluk);
                 document.getElementById('t-rad').innerText    = fmt(tRad);
                 document.getElementById('t-skela').innerText  = fmt(tSkela);
-                document.getElementById('t-ostalo').innerText = fmt(tOstalo);
                 document.getElementById('t-ukupno').innerText = fmt(tUkupno);
                 document.getElementById('t-pdv').innerText    = fmt(tPdv);
                 document.getElementById('t-ukupno-pdv').innerText = fmt(tSPdv);
@@ -438,7 +498,8 @@
                 document.getElementById('troskovi-panel').classList.add('hidden');
             }
 
-            trenutniProracun.troskovi = { tDrvo, tPokrov, tFolija, tRad, tSkela, tOstalo, tUkupno, tPdv, tSPdv };
+            trenutniProracun.troskovi = { tDrvo, tOSB, tPokrov, tFolija, tSlje, tSpoj, tOluk, tRad, tSkela, tUkupno, tPdv, tSPdv };
+            trenutniProracun.kolicine = { m2OSB, sljeDuzina, zabatDuzina, kgEkseri, komVijci, komKutnici, olukDuzina, komPrihvatnica, komSlivnik };
 
             // --- POPIS MATERIJALA ---
             azurirajPopis();
@@ -462,55 +523,113 @@
 
         function azurirajPopis() {
             const p = trenutniProracun;
-            const cDrvo   = parseFloat(document.getElementById('cDrvo').value)   || 0;
-            const cPokrov = parseFloat(document.getElementById('cPokrov').value) || 0;
-            const cFolija = parseFloat(document.getElementById('cFolija').value) || 0;
-            const cRad    = parseFloat(document.getElementById('cRad').value)    || 0;
-            const cSkela  = parseFloat(document.getElementById('cSkela').value)  || 0;
-            const cOstalo = parseFloat(document.getElementById('cOstalo').value) || 0;
+            const k = p.kolicine || {};
+            const cDrvo        = parseFloat(document.getElementById('cDrvo').value)        || 0;
+            const cOSB         = parseFloat(document.getElementById('cOSB').value)         || 0;
+            const cPokrov      = parseFloat(document.getElementById('cPokrov').value)      || 0;
+            const cFolija      = parseFloat(document.getElementById('cFolija').value)      || 0;
+            const cSljemenjak  = parseFloat(document.getElementById('cSljemenjak').value)  || 0;
+            const cZabat       = parseFloat(document.getElementById('cZabat').value)       || 0;
+            const cEkseri      = parseFloat(document.getElementById('cEkseri').value)      || 0;
+            const cVijci       = parseFloat(document.getElementById('cVijci').value)       || 0;
+            const cKutnici     = parseFloat(document.getElementById('cKutnici').value)     || 0;
+            const cOluk        = parseFloat(document.getElementById('cOluk').value)        || 0;
+            const cPrihvatnica = parseFloat(document.getElementById('cPrihvatnica').value) || 0;
+            const cSlivnik     = parseFloat(document.getElementById('cSlivnik').value)     || 0;
+            const cRad         = parseFloat(document.getElementById('cRad').value)         || 0;
+            const cSkela       = parseFloat(document.getElementById('cSkela').value)       || 0;
+            const cOstalo      = parseFloat(document.getElementById('cOstalo').value)      || 0;
 
-            const fmtN = (v, dec=2) => parseFloat(v).toFixed(dec);
+            const n2 = v => parseFloat(v).toFixed(2);
+            const n0 = v => Math.round(parseFloat(v));
             const fmtE = v => v > 0 ? v.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €' : '—';
 
-            const stavke = [
-                { naziv: 'Rogovi 10×12 cm', kolicina: fmtN(p.metaraRog), jed: 'm', cijena: cDrvo ? (parseFloat(p.m3Rog) * cDrvo) : 0, napomena: `(${p.brojRogova} kom × ${fmtN(parseFloat(p.metaraRog)/p.brojRogova)}m = ${fmtN(p.m3Rog)} m³)` },
-                { naziv: 'Letve 4×5 cm', kolicina: fmtN(p.metaraLetve), jed: 'm', cijena: cDrvo ? (parseFloat(p.m3Letve) * cDrvo) : 0, napomena: `(${fmtN(p.m3Letve)} m³)` },
-                { naziv: 'Kontra-letve 4×5 cm', kolicina: fmtN(p.metaraKontraletve), jed: 'm', cijena: cDrvo ? (parseFloat(p.m3Kontraletve) * cDrvo) : 0, napomena: `(${fmtN(p.m3Kontraletve)} m³)` },
+            const grupe = [
+                {
+                    naziv: '🪵 DRVENA KONSTRUKCIJA',
+                    stavke: [
+                        { naziv: 'Rogovi 10×12 cm', kol: n2(p.metaraRog), jed: 'm', napomena: `${p.brojRogova} kom × ${n2(parseFloat(p.metaraRog)/p.brojRogova)} m`, cj: cDrvo, ukupno: parseFloat(p.m3Rog)*cDrvo, jedCij: parseFloat(p.m3Rog)*cDrvo/parseFloat(p.metaraRog) },
+                        { naziv: 'Letve 4×5 cm', kol: n2(p.metaraLetve), jed: 'm', napomena: `${n2(p.m3Letve)} m³`, cj: cDrvo, ukupno: parseFloat(p.m3Letve)*cDrvo, jedCij: parseFloat(p.m3Letve)*cDrvo/parseFloat(p.metaraLetve) },
+                        { naziv: 'Kontra-letve 4×5 cm', kol: n2(p.metaraKontraletve), jed: 'm', napomena: `${n2(p.m3Kontraletve)} m³`, cj: cDrvo, ukupno: parseFloat(p.m3Kontraletve)*cDrvo, jedCij: parseFloat(p.m3Kontraletve)*cDrvo/parseFloat(p.metaraKontraletve) },
+                        ...(parseFloat(p.m2Daske)>0 ? [{ naziv: 'Daske (podloga lim)', kol: n2(p.m2Daske), jed: 'm²', napomena: `${n2(p.m3Daske)} m³`, cj: cDrvo, ukupno: parseFloat(p.m3Daske)*cDrvo }] : []),
+                        { naziv: '── UKUPNO drvo', kol: n2(p.ukupnoDrvoM3), jed: 'm³', bold: true, ukupno: parseFloat(p.ukupnoDrvoM3)*cDrvo },
+                    ]
+                },
+                {
+                    naziv: '📦 PLOČE',
+                    stavke: [
+                        { naziv: 'OSB ploče 18mm (s otpadom 10%)', kol: n2(k.m2OSB||0), jed: 'm²', cj: cOSB, ukupno: (k.m2OSB||0)*cOSB },
+                    ]
+                },
+                {
+                    naziv: '🏠 POKRIVANJE & IZOLACIJA',
+                    stavke: [
+                        { naziv: `Pokrov — ${p.vrstaPokrova}`, kol: n2(p.povrsinaKrova), jed: 'm²', cj: cPokrov, ukupno: parseFloat(p.povrsinaKrova)*cPokrov },
+                        { naziv: 'Hidroizolacijska folija (s preklopom)', kol: n2(p.m2Folije), jed: 'm²', cj: cFolija, ukupno: parseFloat(p.m2Folije)*cFolija },
+                        ...((k.sljeDuzina||0)>0 ? [{ naziv: 'Sljemenjaci', kol: n2(k.sljeDuzina), jed: 'm', cj: cSljemenjak, ukupno: (k.sljeDuzina||0)*cSljemenjak }] : []),
+                        { naziv: 'Zabatni opšav', kol: n2(k.zabatDuzina||0), jed: 'm', cj: cZabat, ukupno: (k.zabatDuzina||0)*cZabat },
+                    ]
+                },
+                {
+                    naziv: '🔩 SPOJNI MATERIJAL',
+                    stavke: [
+                        { naziv: 'Ekseri 4.2×100mm', kol: n2(k.kgEkseri||0), jed: 'kg', napomena: `≈ 1.5 kg / m³ drva`, cj: cEkseri, ukupno: (k.kgEkseri||0)*cEkseri },
+                        { naziv: 'Vijci za letve 4×60mm', kol: n0(k.komVijci||0), jed: 'kom', napomena: `2 vijka / letva-rog spoj`, cj: cVijci, ukupno: ((k.komVijci||0)/100)*cVijci },
+                        { naziv: 'Kutnici / Ankeri za rogove', kol: n0(k.komKutnici||0), jed: 'kom', napomena: `2 kom / rog`, cj: cKutnici, ukupno: (k.komKutnici||0)*cKutnici },
+                    ]
+                },
+                {
+                    naziv: '💧 OLUČNI SUSTAV',
+                    stavke: [
+                        { naziv: 'Oluk polutka', kol: n2(k.olukDuzina||0), jed: 'm', cj: cOluk, ukupno: (k.olukDuzina||0)*cOluk },
+                        { naziv: 'Prihvatnice oljuka (na 50 cm)', kol: n0(k.komPrihvatnica||0), jed: 'kom', cj: cPrihvatnica, ukupno: (k.komPrihvatnica||0)*cPrihvatnica },
+                        { naziv: 'Slivnici + koljena', kol: n0(k.komSlivnik||0), jed: 'kom', napomena: `1 slivnik / 8 m oljuka`, cj: cSlivnik, ukupno: (k.komSlivnik||0)*cSlivnik },
+                    ]
+                },
+                {
+                    naziv: '👷 RADOVI & OSTALO',
+                    stavke: [
+                        { naziv: `Radna snaga (${p.ukupnoDana} dana × ${p.brojRadnika} radnika)`, kol: p.ukupnoDana*p.brojRadnika, jed: 'dan/osoba', cj: cRad, ukupno: p.ukupnoDana*p.brojRadnika*cRad },
+                        ...(cSkela>0 ? [{ naziv: 'Skela / Dizalica', kol: 1, jed: 'paušal', ukupno: cSkela }] : []),
+                        ...(cOstalo>0 ? [{ naziv: 'Ostalo', kol: 1, jed: 'paušal', ukupno: cOstalo }] : []),
+                    ]
+                },
             ];
-            if (parseFloat(p.m2Daske) > 0) {
-                stavke.push({ naziv: 'Daske (podloga za lim)', kolicina: fmtN(p.m2Daske), jed: 'm²', cijena: cDrvo ? (parseFloat(p.m3Daske) * cDrvo) : 0, napomena: `(${fmtN(p.m3Daske)} m³)` });
-            }
-            stavke.push({ naziv: '— UKUPNO drvena građa —', kolicina: fmtN(p.ukupnoDrvoM3), jed: 'm³', cijena: cDrvo ? (parseFloat(p.ukupnoDrvoM3) * cDrvo) : 0, bold: true });
-            stavke.push({ naziv: `Folija (s preklopom 15%)`, kolicina: fmtN(p.m2Folije), jed: 'm²', cijena: cFolija ? (parseFloat(p.m2Folije) * cFolija) : 0 });
-            stavke.push({ naziv: `Pokrov — ${p.vrstaPokrova}`, kolicina: fmtN(p.povrsinaKrova), jed: 'm²', cijena: cPokrov ? (parseFloat(p.povrsinaKrova) * cPokrov) : 0 });
-            stavke.push({ naziv: `Radna snaga (${p.ukupnoDana} dana × ${p.brojRadnika} radnika)`, kolicina: p.ukupnoDana * p.brojRadnika, jed: 'dan/osoba', cijena: cRad ? (p.ukupnoDana * p.brojRadnika * cRad) : 0 });
-            if (cSkela > 0) stavke.push({ naziv: 'Skela / Dizalica', kolicina: 1, jed: 'paušal', cijena: cSkela });
-            if (cOstalo > 0) stavke.push({ naziv: 'Ostalo', kolicina: 1, jed: 'paušal', cijena: cOstalo });
 
             const body = document.getElementById('popis-body');
             const foot = document.getElementById('popis-foot');
-            body.innerHTML = stavke.map(s => `
-                <tr class="border-b border-slate-800 hover:bg-slate-800/40 ${s.bold ? 'bg-slate-800/60 text-white font-semibold' : ''}">
-                    <td class="py-2 pr-2">${s.naziv}${s.napomena ? '<br><span class="text-xs text-slate-500">'+s.napomena+'</span>' : ''}</td>
-                    <td class="text-right py-2 px-2 font-mono">${s.kolicina}</td>
-                    <td class="text-right py-2 px-2 text-slate-400">${s.jed}</td>
-                    <td class="text-right py-2 px-2 text-slate-400">${s.cijena && cDrvo || cPokrov || cFolija || cRad || cSkela || cOstalo ? (s.bold ? '—' : (s.cijena > 0 ? (s.cijena / (parseFloat(s.kolicina)||1)).toLocaleString('hr-HR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €' : '—')) : '—'}</td>
-                    <td class="text-right py-2 pl-2 ${s.bold ? 'text-yellow-400' : 'text-white'}">${fmtE(s.cijena)}</td>
-                </tr>`).join('');
+            let html = '';
+            let grandTotal = 0;
 
-            const tUkupno = stavke.reduce((sum, s) => sum + (s.cijena||0), 0);
-            if (tUkupno > 0) {
-                const pdv = tUkupno * 0.25;
+            grupe.forEach(g => {
+                html += `<tr><td colspan="5" class="pt-4 pb-1"><span class="text-xs font-bold text-slate-400 uppercase tracking-wider">${g.naziv}</span></td></tr>`;
+                g.stavke.forEach(s => {
+                    const uk = s.ukupno || 0;
+                    if (!s.bold) grandTotal += uk;
+                    const jedCijTxt = s.jedCij > 0 ? s.jedCij.toLocaleString('hr-HR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €' : (s.cj > 0 ? s.cj.toLocaleString('hr-HR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €' : '—');
+                    html += `<tr class="border-b border-slate-800/60 hover:bg-slate-800/30 ${s.bold ? 'bg-slate-800/50 font-semibold' : ''}">
+                        <td class="py-1.5 pr-2 text-sm ${s.bold ? 'text-yellow-300' : 'text-slate-200'}">${s.naziv}${s.napomena ? '<br><span class="text-xs text-slate-500 font-normal">'+s.napomena+'</span>' : ''}</td>
+                        <td class="text-right py-1.5 px-2 font-mono text-sm ${s.bold ? 'text-yellow-300' : 'text-white'}">${s.kol}</td>
+                        <td class="text-right py-1.5 px-2 text-xs text-slate-400">${s.jed}</td>
+                        <td class="text-right py-1.5 px-2 text-xs text-slate-500">${s.bold ? '' : jedCijTxt}</td>
+                        <td class="text-right py-1.5 pl-2 text-sm ${s.bold ? 'text-yellow-400 font-bold' : (uk>0?'text-white':'text-slate-600')}">${fmtE(uk)}</td>
+                    </tr>`;
+                });
+            });
+
+            body.innerHTML = html;
+
+            if (grandTotal > 0) {
+                const pdv = grandTotal * 0.25;
                 foot.innerHTML = `
-                    <tr><td colspan="4" class="pt-3 text-slate-300">Ukupno (bez PDV-a)</td><td class="text-right pt-3 text-yellow-400">${fmtE(tUkupno)}</td></tr>
-                    <tr><td colspan="4" class="text-slate-400 text-xs">PDV 25%</td><td class="text-right text-slate-400 text-xs">${fmtE(pdv)}</td></tr>
-                    <tr><td colspan="4" class="text-green-400 pt-1">UKUPNO S PDV-om</td><td class="text-right text-green-400 text-base">${fmtE(tUkupno + pdv)}</td></tr>`;
+                    <tr class="border-t-2 border-slate-600"><td colspan="4" class="pt-3 font-bold text-white">SVEUKUPNO (bez PDV-a)</td><td class="text-right pt-3 text-yellow-400 font-bold text-base">${fmtE(grandTotal)}</td></tr>
+                    <tr><td colspan="4" class="text-slate-400 text-xs pb-1">PDV 25%</td><td class="text-right text-slate-400 text-xs">${fmtE(pdv)}</td></tr>
+                    <tr class="bg-green-900/20"><td colspan="4" class="text-green-400 font-bold py-2">UKUPNO S PDV-om</td><td class="text-right text-green-400 font-bold text-base">${fmtE(grandTotal+pdv)}</td></tr>`;
             } else {
-                foot.innerHTML = '';
+                foot.innerHTML = `<tr><td colspan="5" class="pt-4 text-xs text-slate-500 text-center">Unesite cijene materijala lijevo za prikaz ukupnih troškova</td></tr>`;
             }
 
-            // Spremi u trenutniProracun za PDF
-            trenutniProracun.popisStavke = stavke;
+            trenutniProracun.popisGrupe = grupe;
         }
 
         function izracunajDatumeFaza(datumPocetkaStr, fazaPredlozak) {
@@ -948,62 +1067,59 @@
                 doc.text("UKUPNO S PDV-om:", 18, y); doc.text(fmt2(tr.tSPdv), 150, y);
             }
 
-            // Stranica 2: Popis materijala (detaljna tablica)
-            if (p.popisStavke && p.popisStavke.length > 0) {
+            // Stranica 2: Popis materijala po grupama
+            if (p.popisGrupe && p.popisGrupe.length > 0) {
                 doc.addPage();
                 let y2 = 18;
                 doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(37, 99, 235);
                 doc.text("POPIS MATERIJALA — DETALJNA SPECIFIKACIJA", 105, y2, null, null, "center");
                 y2 += 8;
-                doc.setDrawColor(37, 99, 235); doc.setLineWidth(0.5); doc.line(15, y2, 195, y2); y2 += 6;
+                doc.setDrawColor(37, 99, 235); doc.setLineWidth(0.5); doc.line(15, y2, 195, y2); y2 += 5;
 
-                // Zaglavlje tablice
-                doc.setFillColor(30, 41, 59); doc.rect(15, y2-4, 180, 8, 'F');
+                doc.setFillColor(30, 41, 59); doc.rect(15, y2-3, 180, 7, 'F');
                 doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(148, 163, 184);
-                doc.text("MATERIJAL", 17, y2+1);
-                doc.text("KOLIČINA", 115, y2+1, null, null, "right");
-                doc.text("JED.", 130, y2+1, null, null, "right");
-                doc.text("JED. CIJ.", 158, y2+1, null, null, "right");
+                doc.text("MATERIJAL", 17, y2+1); doc.text("KOLIČINA", 118, y2+1, null, null, "right");
+                doc.text("JED.", 133, y2+1, null, null, "right"); doc.text("JED. CIJ.", 161, y2+1, null, null, "right");
                 doc.text("UKUPNO", 192, y2+1, null, null, "right");
-                y2 += 9;
+                y2 += 8;
 
                 const fmtE2 = v => v > 0 ? v.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €' : '—';
-                let redBroj = 0;
                 let grandTotal = 0;
-                p.popisStavke.forEach(s => {
-                    if (y2 > 270) { doc.addPage(); y2 = 20; }
-                    if (redBroj % 2 === 0) { doc.setFillColor(15, 23, 42); doc.rect(15, y2-3.5, 180, 7, 'F'); }
-                    const bold = s.bold || false;
-                    doc.setFont("helvetica", bold ? "bold" : "normal");
-                    doc.setFontSize(8.5);
-                    doc.setTextColor(bold ? 255 : 220, bold ? 255 : 220, bold ? 255 : 220);
-                    doc.text(s.naziv, 17, y2);
-                    doc.text(String(s.kolicina), 115, y2, null, null, "right");
-                    doc.text(s.jed, 130, y2, null, null, "right");
-                    // Jedinična cijena
-                    const ukupnoCijene = s.cijena || 0;
-                    const jedCijena = ukupnoCijene > 0 && parseFloat(s.kolicina) > 0 && !bold ? ukupnoCijene / parseFloat(s.kolicina) : 0;
-                    doc.setTextColor(150, 150, 180);
-                    doc.text(jedCijena > 0 ? jedCijena.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €' : '—', 158, y2, null, null, "right");
-                    doc.setTextColor(bold ? 250 : 200, bold ? 220 : 200, bold ? 50 : 200);
-                    doc.text(fmtE2(ukupnoCijene), 192, y2, null, null, "right");
-                    if (!bold) grandTotal += ukupnoCijene;
-                    y2 += 7;
-                    redBroj++;
+
+                p.popisGrupe.forEach(g => {
+                    if (y2 > 265) { doc.addPage(); y2 = 20; }
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(100, 160, 220);
+                    doc.text(g.naziv.replace(/[^\x00-\x7F]/g, c => c), 17, y2); y2 += 6;
+
+                    g.stavke.forEach(s => {
+                        if (y2 > 270) { doc.addPage(); y2 = 20; }
+                        const uk = s.ukupno || 0;
+                        if (!s.bold) grandTotal += uk;
+                        doc.setFont("helvetica", s.bold ? "bold" : "normal"); doc.setFontSize(8.5);
+                        doc.setTextColor(s.bold ? 250 : 210, s.bold ? 220 : 210, s.bold ? 50 : 210);
+                        const nazivTxt = s.naziv.substring(0, 55);
+                        doc.text(nazivTxt, 17, y2);
+                        doc.text(String(s.kol), 118, y2, null, null, "right");
+                        doc.setTextColor(150, 150, 180); doc.text(s.jed, 133, y2, null, null, "right");
+                        const jedCijN = s.jedCij > 0 ? s.jedCij : (!s.bold && uk > 0 && parseFloat(s.kol) > 0 ? uk / parseFloat(s.kol) : 0);
+                        doc.text(jedCijN > 0 ? jedCijN.toLocaleString('hr-HR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €' : '—', 161, y2, null, null, "right");
+                        doc.setTextColor(s.bold ? 250 : 200, s.bold ? 200 : 200, s.bold ? 50 : 200);
+                        doc.text(fmtE2(uk), 192, y2, null, null, "right");
+                        y2 += 6;
+                    });
+                    y2 += 2;
                 });
 
                 if (grandTotal > 0) {
-                    y2 += 3;
+                    if (y2 > 258) { doc.addPage(); y2 = 20; }
                     doc.setDrawColor(37, 99, 235); doc.setLineWidth(0.4); doc.line(15, y2, 195, y2); y2 += 6;
                     doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(240, 200, 50);
                     doc.text("SVEUKUPNO (bez PDV-a):", 17, y2);
-                    doc.text(grandTotal.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €', 192, y2, null, null, "right");
-                    y2 += 7;
-                    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(130, 130, 130);
+                    doc.text(grandTotal.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €', 192, y2, null, null, "right"); y2 += 7;
                     const pdv2 = grandTotal * 0.25;
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(130,130,130);
                     doc.text("PDV 25%:", 17, y2);
-                    doc.text(pdv2.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €', 192, y2, null, null, "right");
-                    y2 += 7;
+                    doc.text(pdv2.toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €', 192, y2, null, null, "right"); y2 += 7;
                     doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(50, 200, 100);
                     doc.text("UKUPNO S PDV-om:", 17, y2);
                     doc.text((grandTotal + pdv2).toLocaleString('hr-HR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €', 192, y2, null, null, "right");
